@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TERRAPhish</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="logo.png" alt="TERRAPhish Logo" class="logo">
+      <button class="close-btn">X</button>
+    </div>
+
+    <div class="controls">
+      <label><input type="checkbox" id="selectAll"> Select All</label>
+      <div class="search-section">
+        <input type="text" placeholder="SEARCH">
+        <button class="scan-btn">SCAN</button>
+      </div>
+    </div>
+    <p class="url-count">3 URL detected on page</p>
+
+    <div class="url-item">
+      <span class="status green"></span>
+      <input type="checkbox" class="url-checkbox">
+      <span class="url-text">www.henkdeinumboomkwekerij.nl/language/pdf_fonts/smiles.php</span>
+    </div>
+
+    <div class="url-item">
+      <span class="status red"></span>
+      <input type="checkbox" class="url-checkbox">
+      <span class="url-text">lingshc.com/old_aol.1.3/?Login=&amp;Lis=10&amp;LigertID=1993745&amp;us=1</span>
+    </div>
+
+    <div class="url-item">
+      <span class="status yellow"></span>
+      <input type="checkbox" class="url-checkbox">
+      <span class="url-text">www.regaranch.info/grafika/file/2012/atualizacao/www.itau.com.br/</span>
+    </div>
+
+    <div class="user-footer">
+      <div class="user-info">
+        <div class="avatar">FG</div>
+        <div>
+          <div class="name">Franiel</div>
+          <div class="email">franielramos1@gmail.com</div>
+        </div>
+      </div>
+      <div class="user-actions">
+        <a href="#" class="view-link">View History</a>
+        <a href="#" class="block-link">Block</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const selectAll = document.getElementById('selectAll');
+      const checkboxes = document.querySelectorAll('.url-checkbox');
+      const closeBtn = document.querySelector('.close-btn');
+
+      selectAll.addEventListener('change', function () {
+        checkboxes.forEach(cb => cb.checked = selectAll.checked);
+      });
+
+      closeBtn.addEventListener('click', function () {
+        window.close();
+      });
+    });
+  </script>
+</body>
+</html>
