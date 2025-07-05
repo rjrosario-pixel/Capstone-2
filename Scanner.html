@@ -4,71 +4,146 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Phishing Scanner</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <header>
+<header>
   <div class="logo">
-    <img src="logo(1).png" alt="logo" />
+    <img src="logo.png" alt="logo" />
   </div>
   <nav>
-    <a href="Scanner.html" class="active">URL and Domain Scanner</a>
-    <a href="BlockPage.html">Blocking</a>
-    <a href="dash.html">Dashboard</a>
+    <a href="Scanner.html" id="nav-scanner" class="active">URL and Domain Scanner</a>
+    <a href="BlockPage.html" id="nav-blocking">Blocking</a>
+    <a href="dash.html" id="nav-dashboard">Dashboard</a>
   </nav>
-  <div class="profile">
-    <nav class="notification-nav">
-      <span class="bell" title="Notifications">🔔</span>
-    </nav>
-    <img src="https://i.pravatar.cc/100?img=15" alt="User" />
-    <span>Mami Oni</span>
+<div class="profile">
+  <nav class="notification-nav">
+    <span class="bell" title="Notifications">🔔</span>
+  </nav>
+  <span id="nav-user">User</span>
+  <div class="dropdown">
+    <button id="menu-btn" class="menu-btn">⋮</button>
+    <div class="dropdown-content" id="dropdown-menu">
+      <button id="logout-btn">Log Out</button>
+    </div>
   </div>
+</div>
+
 </header>
 
-
- <div class="main-container">
+<div class="main-container">
   <div class="scanner-box">
     <h2>Scan Here to Check If the Link Is a Phishing Threat!</h2>
     <input type="text" id="urlInput" placeholder="Type any URL or Domain" />
-    <button onclick="scanURL()">Scan</button>
+    <button id="scanBtn">Scan</button>
     <div id="result" style="margin-top: 20px; font-weight: bold;"></div>
   </div>
 </div>
 
-<script>
-  async function scanURL() {
-    const url = document.getElementById('urlInput').value;
+<script type="module">
+
+  // Toggle dropdown visibility
+const menuBtn = document.getElementById("menu-btn");
+const dropdown = document.getElementById("dropdown-menu");
+menuBtn.addEventListener("click", () => {
+  dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+});
+
+// Logout
+document.getElementById("logout-btn").addEventListener("click", async () => {
+  await auth.signOut();
+  window.location.href = "login.html";
+});
+
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+  import { getFirestore, addDoc, collection } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDtzvIR11c-NBvCrfiulpW3Vs0rNWmMJao",
+    authDomain: "terraphish-a125f.firebaseapp.com",
+    projectId: "terraphish-a125f",
+    storageBucket: "terraphish-a125f.appspot.com",
+    messagingSenderId: "539516088656",
+    appId: "1:539516088656:web:fec9092a9f7fd99901bc55",
+    measurementId: "G-0RSTFT0X1F"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  let currentUser = null;
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      currentUser = user;
+      document.getElementById("nav-user").textContent = user.email;
+    } else {
+      window.location.href = "login.html";
+    }
+  });
+
+  // Highlight current nav
+  const current = window.location.pathname.split("/").pop();
+  if (current.includes("Scanner")) document.getElementById("nav-scanner")?.classList.add("active");
+  if (current.includes("BlockPage")) document.getElementById("nav-blocking")?.classList.add("active");
+  if (current.includes("dash")) document.getElementById("nav-dashboard")?.classList.add("active");
+
+  document.getElementById('scanBtn').addEventListener('click', async () => {
+    const url = document.getElementById('urlInput').value.trim();
+    const resultDiv = document.getElementById('result');
+
     if (!url) {
-      document.getElementById('result').innerText = "Please enter a URL.";
+      resultDiv.innerText = "Please enter a URL.";
       return;
     }
+
+    resultDiv.innerText = "Scanning...";
 
     try {
       const response = await fetch('/predict', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ url: url })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url })
       });
 
       const data = await response.json();
 
-      if (data.result) {
-        document.getElementById('result').innerText = `Result: ${data.result}`;
-      } else {
-        document.getElementById('result').innerText = "Error: Unexpected response.";
+      if (!data.result) {
+        resultDiv.innerText = "Unexpected server response.";
+        return;
       }
+
+      const status = data.result;
+      resultDiv.innerText = `Result: ${status.toUpperCase()}`;
+
+      if (currentUser) {
+        await addDoc(collection(db, "phishing_urls"), {
+          uid: currentUser.uid,
+          url: url,
+          domain: extractDomain(url),
+          ip: null,
+          result: status,
+          timestamp: new Date()
+        });
+      }
+
     } catch (error) {
-      console.error('Error:', error);
-      document.getElementById('result').innerText = "Error: Unable to scan.";
+      console.error("Scan error:", error);
+      resultDiv.innerText = "Error scanning URL.";
+    }
+  });
+
+  function extractDomain(url) {
+    try {
+      return new URL(url).hostname;
+    } catch {
+      return "Invalid";
     }
   }
 </script>
-
-
 
 </body>
 </html>

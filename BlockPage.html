@@ -8,99 +8,136 @@
 </head>
 <body>
 
-  <header>
+<header>
   <div class="logo">
-    <img src="logo(1).png" alt="logo" />
+    <img src="logo.png" alt="logo" />
   </div>
   <nav>
-    <a href="Scanner.html" class="active">URL and Domain Scanner</a>
-    <a href="BlockPage.html">Blocking</a>
-    <a href="dash.html">Dashboard</a>
+    <a href="Scanner.html" id="nav-scanner">URL and Domain Scanner</a>
+    <a href="BlockPage.html" id="nav-blocking" class="active">Blocking</a>
+    <a href="dash.html" id="nav-dashboard">Dashboard</a>
   </nav>
   <div class="profile">
-    <nav class="notification-nav">
-      <span class="bell" title="Notifications">🔔</span>
-    </nav>
-    <img src="https://i.pravatar.cc/100?img=15" alt="User" />
-    <span>Mami Oni</span>
+  <nav class="notification-nav">
+    <span class="bell" title="Notifications">🔔</span>
+  </nav>
+  <span id="nav-user">User</span>
+  <div class="dropdown">
+    <button id="menu-btn" class="menu-btn">⋮</button>
+    <div class="dropdown-content" id="dropdown-menu">
+      <button id="logout-btn">Log Out</button>
+    </div>
   </div>
+</div>
+
 </header>
 
-
-
-  <div class="page">
-    <div class="container">
-      <div class="section-title">History</div>
-      <table>
+<div class="page">
+  <div class="container">
+    <div class="section-title">Blacklist</div>
+    <table>
+      <thead>
         <tr>
           <th>Source URL</th>
           <th>Domain Name</th>
           <th>IP Address</th>
-          <th>Date</th>
           <th>Status</th>
           <th>Action</th>
         </tr>
-        <tr>
-          <td>https://facebook.com</td>
-          <td>Facebook.com</td>
-          <td>192.168.10.10</td>
-          <td>14 Feb 2019</td>
-          <td><span class="status-safe">Safe</span></td>
-          <td><button class="block-btn">Block</button></td>
-        </tr>
-        <tr>
-          <td>https://paypal-account.ru</td>
-          <td>PayPal.com</td>
-          <td>186.76.34.11</td>
-          <td>14 Feb 2019</td>
-          <td><span class="status-unknown">Unknown</span></td>
-          <td><button class="block-btn">Block</button></td>
-        </tr>
-        <tr>
-          <td>https://netflix-helpercenter.site</td>
-          <td>Netflix.com</td>
-          <td>88.193.34.5</td>
-          <td>14 Feb 2019</td>
-          <td><span class="status-safe">Safe</span></td>
-          <td><button class="block-btn">Block</button></td>
-        </tr>
-      </table>
-    </div>
-
-    <div class="container">
-  <div class="section-title">Blacklist</div>
-  <table>
-    <tr>
-      <th>Source URL</th>
-      <th>Domain Name</th>
-      <th>IP Address</th>
-      <th>Status</th>
-      <th>Action</th>
-    </tr>
-    <tr>
-      <td>https://Messenger.com</td>
-      <td>Messenger.com</td>
-      <td>192.10.10.1</td>
-      <td><span class="status-phish">Phish</span></td>
-      <td><button class="block-btn">Remove</button></td>
-    </tr>
-    <tr>
-      <td>https://Bisuya.net</td>
-      <td>Bisuya.net</td>
-      <td>192.7.27.8</td>
-      <td><span class="status-phish">Phish</span></td>
-      <td><button class="block-btn">Remove</button></td>
-    </tr>
-    <tr>
-      <td>https://Facebooklogin.com.ph</td>
-      <td>Facebook.com</td>
-      <td>192.168.10.8</td>
-      <td><span class="status-phish">Phish</span></td>
-      <td><button class="block-btn">Remove</button></td>
-    </tr>
-  </table>
+      </thead>
+      <tbody id="blacklist-table">
+        <!-- Data from Firestore will appear here -->
+      </tbody>
+    </table>
+  </div>
 </div>
 
+<!-- Firebase logic -->
+<script type="module">
+
+  // Toggle dropdown visibility
+const menuBtn = document.getElementById("menu-btn");
+const dropdown = document.getElementById("dropdown-menu");
+menuBtn.addEventListener("click", () => {
+  dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+});
+
+// Logout
+document.getElementById("logout-btn").addEventListener("click", async () => {
+  await auth.signOut();
+  window.location.href = "login.html";
+});
+
+
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+  import { getFirestore, collection, query, where, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDtzvIR11c-NBvCrfiulpW3Vs0rNWmMJao",
+    authDomain: "terraphish-a125f.firebaseapp.com",
+    projectId: "terraphish-a125f",
+    storageBucket: "terraphish-a125f.appspot.com",
+    messagingSenderId: "539516088656",
+    appId: "1:539516088656:web:fec9092a9f7fd99901bc55",
+    measurementId: "G-0RSTFT0X1F"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const blacklistTable = document.getElementById("blacklist-table");
+  const userEmail = document.getElementById("nav-user");
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    userEmail.textContent = user.email;
+
+    const q = query(
+      collection(db, "phishing_urls"),
+      where("uid", "==", user.uid),
+      where("result", "==", "phish")
+    );
+
+    const snapshot = await getDocs(q);
+
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      const row = document.createElement("tr");
+
+      row.innerHTML = `
+        <td>${data.url}</td>
+        <td>${data.domain || "-"}</td>
+        <td>${data.ip || "-"}</td>
+        <td><span class="status-phish">Phish</span></td>
+        <td><button class="block-btn" data-id="${docSnap.id}">Remove</button></td>
+      `;
+
+      blacklistTable.appendChild(row);
+    });
+
+    document.querySelectorAll(".block-btn").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const id = btn.getAttribute("data-id");
+        if (confirm("Are you sure you want to remove this URL from blacklist?")) {
+          await deleteDoc(doc(db, "phishing_urls", id));
+          btn.closest("tr").remove();
+        }
+      });
+    });
+  });
+
+  // Highlight current nav
+  const current = window.location.pathname.split("/").pop();
+  if (current.includes("Scanner")) document.getElementById("nav-scanner")?.classList.add("active");
+  if (current.includes("BlockPage")) document.getElementById("nav-blocking")?.classList.add("active");
+  if (current.includes("dash")) document.getElementById("nav-dashboard")?.classList.add("active");
+</script>
 
 </body>
 </html>
