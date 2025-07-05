@@ -352,3 +352,43 @@ th, td {
   font-size: 1.2rem;
   cursor: pointer;
 }
+
+.menu-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  margin-left: 10px;
+  color: #111827;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: white;
+  min-width: 100px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  z-index: 1;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.dropdown-content button {
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  color: #111827;
+}
+
+.dropdown-content button:hover {
+  background-color: #f0f0f0;
+}

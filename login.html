@@ -12,15 +12,15 @@
       <h2>Login to Account</h2>
       <p>Please enter your email and password to continue</p>
 
-      <form>
+      <form id="login-form">
         <label class="text-label">Email address:</label>
-        <input type="email" placeholder="Enter E-mail" required />
+        <input type="email" id="email" placeholder="Enter E-mail" required />
 
         <div class="text-label">
           <label>Password</label>
-          <a href="#" class="forgot">Forget Password?</a>
+          <a href="#" class="forgot">Forgot Password?</a>
         </div>
-        <input type="password" placeholder="●●●●●●●" required />
+        <input type="password" id="password" placeholder="●●●●●●●" required />
 
         <div class="remember">
           <input type="checkbox" id="remember" />
@@ -35,5 +35,43 @@
       </p>
     </div>
   </div>
+
+  <!-- Firebase SDK (v11.10.0) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-analytics.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDtzvIR11c-NBvCrfiulpW3Vs0rNWmMJao",
+      authDomain: "terraphish-a125f.firebaseapp.com",
+      projectId: "terraphish-a125f",
+      storageBucket: "terraphish-a125f.firebasestorage.app",
+      messagingSenderId: "539516088656",
+      appId: "1:539516088656:web:fec9092a9f7fd99901bc55",
+      measurementId: "G-0RSTFT0X1F"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+
+    // Handle login form
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        alert("Login successful!");
+        // Redirect to dashboard (or home page)
+        window.location.href = "dash.html"; // change as needed
+      } catch (error) {
+        alert("Login failed: " + error.message);
+        console.error(error);
+      }
+    });
+  </script>
 </body>
 </html>

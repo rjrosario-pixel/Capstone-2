@@ -12,17 +12,15 @@
       <h2>Create an Account</h2>
       <p>Create an account to continue</p>
 
-      <form>
+      <form id="signup-form">
         <label class="text-label">Email Address:</label>
-        <input type="email" placeholder="Enter your email" required />
+        <input type="email" id="email" placeholder="Enter your email" required />
 
         <label class="text-label">Username:</label>
-        <input type="text" placeholder="Username" required />
+        <input type="text" id="username" placeholder="Username" required />
 
-        <div class="text-label">
-          <label>Password</label>
-        </div>
-        <input type="password" placeholder="●●●●●●●" required />
+        <label class="text-label">Password:</label>
+        <input type="password" id="password" placeholder="●●●●●●●" required />
 
         <button type="submit">Sign Up</button>
       </form>
@@ -32,5 +30,60 @@
       </p>
     </div>
   </div>
+
+  <!-- Firebase SDK v11.10.0 -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-analytics.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDtzvIR11c-NBvCrfiulpW3Vs0rNWmMJao",
+      authDomain: "terraphish-a125f.firebaseapp.com",
+      projectId: "terraphish-a125f",
+      storageBucket: "terraphish-a125f.firebasestorage.app",
+      messagingSenderId: "539516088656",
+      appId: "1:539516088656:web:fec9092a9f7fd99901bc55",
+      measurementId: "G-0RSTFT0X1F"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Handle signup form
+    document.getElementById("signup-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // Save additional user info in Firestore
+        await setDoc(doc(db, "users", user.uid), {
+          email: email,
+          username: username,
+          createdAt: new Date()
+        });
+
+        alert("Account created successfully!");
+        window.location.href = "login.html";
+      } catch (error) {
+        if (error.code === "auth/email-already-in-use") {
+          alert("Email already in use. Please login instead.");
+          window.location.href = "login.html";
+        } else {
+          alert("Signup failed: " + error.message);
+          console.error(error);
+        }
+      }
+    });
+  </script>
 </body>
 </html>
