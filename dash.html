@@ -5,12 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Phishing Scanner</title>
   <link rel="stylesheet" href="style.css" />
+
 </head>
 <body class="dash-body">
 
   <header>
     <div class="logo">
-      <img src="logo(1).png" alt="logo" />
+      <img src="images/logo (1).png" alt="logo" />
     </div>
     <nav>
       <a href="Scanner.html">URL and Domain Scanner</a>
@@ -19,12 +20,32 @@
 
     </nav>
         <div class="profile">
-            <nav class="notification-nav">
-            <span class="bell">🔔</span>
-            </nav>
-        <img src="https://i.pravatar.cc/100?img=15" alt="User" />
-        <span>Mami Oni</span>
-        </div>
+  <div class="notification">
+    <span class="bell" onclick="toggleNotifications()">🔔</span>
+    <span class="notification-badge">3</span>
+
+    <div class="notification-box" id="notificationBox">
+      <div class="notification-item">
+        <small>⚠️ ALERT</small> <span class="time">now</span>
+        <p><strong>Phishing Detected</strong><br>
+        This site has been flagged as a phishing threat.<br>
+        <a href="#">Click here to block</a></p>
+      </div>
+      <div class="notification-item">
+        <small>⚠️ ALERT</small> <span class="time">now</span>
+        <p><strong>Safe Browsing</strong><br>
+        This URL is safe. No phishing threats detected.</p>
+      </div>
+      <div class="notification-item">
+        <small>⚠️ ALERT</small> <span class="time">now</span>
+        <p><strong>Are you sure you want to block the site?</strong><br>
+        <a href="#">Click here to block</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
   </header>
     <main class="container">
     <h1>Dashboard</h1>
@@ -102,4 +123,8 @@
       </table>
     </section>
   </main>
+  <script src="notification.js"></script>
+</body>
+
+
 </body>

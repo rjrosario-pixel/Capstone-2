@@ -4,31 +4,53 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Blocking Page</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 
+  <!-- HEADER -->
   <header>
-  <div class="logo">
-    <img src="logo(1).png" alt="logo" />
-  </div>
-  <nav>
-    <a href="Scanner.html" class="active">URL and Domain Scanner</a>
-    <a href="BlockPage.html">Blocking</a>
-    <a href="dash.html">Dashboard</a>
-  </nav>
-  <div class="profile">
-    <nav class="notification-nav">
-      <span class="bell" title="Notifications">🔔</span>
+    <div class="logo">
+      <img src="images/logo1.png" alt="logo" />
+    </div>
+    <nav>
+      <a href="Scanner.html">URL and Domain Scanner</a>
+      <a href="BlockPage.html" class="active">Blocking</a>
+      <a href="dash.html">Dashboard</a>
     </nav>
-    <img src="https://i.pravatar.cc/100?img=15" alt="User" />
-    <span>Mami Oni</span>
+    <div class="profile">
+  <div class="notification">
+    <span class="bell" onclick="toggleNotifications()">🔔</span>
+    <span class="notification-badge">3</span>
+
+    <div class="notification-box" id="notificationBox">
+      <div class="notification-item">
+        <small>⚠️ ALERT</small> <span class="time">now</span>
+        <p><strong>Phishing Detected</strong><br>
+        This site has been flagged as a phishing threat.<br>
+        <a href="#">Click here to block</a></p>
+      </div>
+      <div class="notification-item">
+        <small>⚠️ ALERT</small> <span class="time">now</span>
+        <p><strong>Safe Browsing</strong><br>
+        This URL is safe. No phishing threats detected.</p>
+      </div>
+      <div class="notification-item">
+        <small>⚠️ ALERT</small> <span class="time">now</span>
+        <p><strong>Are you sure you want to block the site?</strong><br>
+        <a href="#">Click here to block</a></p>
+      </div>
+    </div>
   </div>
-</header>
+</div>
 
 
+  </header>
 
+  <!-- MAIN PAGE -->
   <div class="page">
+    
+    <!-- HISTORY -->
     <div class="container">
       <div class="section-title">History</div>
       <table>
@@ -67,39 +89,44 @@
       </table>
     </div>
 
+    <!-- BLACKLIST -->
     <div class="container">
-  <div class="section-title">Blacklist</div>
-  <table>
-    <tr>
-      <th>Source URL</th>
-      <th>Domain Name</th>
-      <th>IP Address</th>
-      <th>Status</th>
-      <th>Action</th>
-    </tr>
-    <tr>
-      <td>https://Messenger.com</td>
-      <td>Messenger.com</td>
-      <td>192.10.10.1</td>
-      <td><span class="status-phish">Phish</span></td>
-      <td><button class="block-btn">Remove</button></td>
-    </tr>
-    <tr>
-      <td>https://Bisuya.net</td>
-      <td>Bisuya.net</td>
-      <td>192.7.27.8</td>
-      <td><span class="status-phish">Phish</span></td>
-      <td><button class="block-btn">Remove</button></td>
-    </tr>
-    <tr>
-      <td>https://Facebooklogin.com.ph</td>
-      <td>Facebook.com</td>
-      <td>192.168.10.8</td>
-      <td><span class="status-phish">Phish</span></td>
-      <td><button class="block-btn">Remove</button></td>
-    </tr>
-  </table>
-</div>
+      <div class="section-title">Blacklist</div>
+      <table>
+        <tr>
+          <th>Source URL</th>
+          <th>Domain Name</th>
+          <th>IP Address</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+        <tr>
+          <td>https://Messenger.com</td>
+          <td>Messenger.com</td>
+          <td>192.10.10.1</td>
+          <td><span class="status-phish">Phish</span></td>
+          <td><button class="block-btn">Remove</button></td>
+        </tr>
+        <tr>
+          <td>https://Bisaya.net</td>
+          <td>Bisaya.net</td>
+          <td>192.7.27.8</td>
+          <td><span class="status-phish">Phish</span></td>
+          <td><button class="block-btn">Remove</button></td>
+        </tr>
+        <tr>
+          <td>https://Facebooklogin.com.ph</td>
+          <td>Facebook.com</td>
+          <td>192.168.10.8</td>
+          <td><span class="status-phish">Phish</span></td>
+          <td><button class="block-btn">Remove</button></td>
+        </tr>
+      </table>
+    </div>
+
+  </div>
+  <script src="notification.js"></script>
+</body>
 
 
 </body>
