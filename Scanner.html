@@ -4,71 +4,83 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Phishing Scanner</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
+  <link rel="stylesheet" href="/static/style.css"> 
 </head>
 <body>
 
-  <header>
+<header>
   <div class="logo">
-    <img src="logo(1).png" alt="logo" />
+    <img src="/static/logo.png" alt="logo" />
   </div>
   <nav>
-    <a href="Scanner.html" class="active">URL and Domain Scanner</a>
-    <a href="BlockPage.html">Blocking</a>
-    <a href="dash.html">Dashboard</a>
+    <a href="Scanner.html" id="nav-scanner" class="active">URL and Domain Scanner</a>
+    <a href="BlockPage.html" id="nav-blocking">Blocking</a>
+    <a href="dash.html" id="nav-dashboard">Dashboard</a>
   </nav>
   <div class="profile">
     <nav class="notification-nav">
       <span class="bell" title="Notifications">🔔</span>
     </nav>
-    <img src="https://i.pravatar.cc/100?img=15" alt="User" />
-    <span>Mami Oni</span>
+    <span id="nav-user">User</span>
+    <div class="dropdown">
+      <button id="menu-btn" class="menu-btn">⋮</button>
+      <div class="dropdown-content" id="dropdown-menu">
+        <button id="logout-btn">Log Out</button>
+      </div>
+    </div>
   </div>
 </header>
 
-
- <div class="main-container">
+<div class="main-container">
   <div class="scanner-box">
     <h2>Scan Here to Check If the Link Is a Phishing Threat!</h2>
     <input type="text" id="urlInput" placeholder="Type any URL or Domain" />
-    <button onclick="scanURL()">Scan</button>
+    <button id="scanBtn">Scan</button>
     <div id="result" style="margin-top: 20px; font-weight: bold;"></div>
   </div>
 </div>
 
 <script>
-  async function scanURL() {
-    const url = document.getElementById('urlInput').value;
+  // Toggle dropdown menu
+  const menuBtn = document.getElementById("menu-btn");
+  const dropdown = document.getElementById("dropdown-menu");
+  menuBtn.addEventListener("click", () => {
+    dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+  });
+
+  // Scanner logic (calls backend Flask API)
+  document.getElementById('scanBtn').addEventListener('click', async () => {
+    const url = document.getElementById('urlInput').value.trim();
+    const resultDiv = document.getElementById('result');
+
     if (!url) {
-      document.getElementById('result').innerText = "Please enter a URL.";
+      resultDiv.innerText = "Please enter a URL.";
       return;
     }
 
+    resultDiv.innerText = "Scanning...";
+
     try {
-      const response = await fetch('/predict', {
+      const response = await fetch('http://127.0.0.1:5000/predict', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ url: url })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url })
       });
 
       const data = await response.json();
 
-      if (data.result) {
-        document.getElementById('result').innerText = `Result: ${data.result}`;
-      } else {
-        document.getElementById('result').innerText = "Error: Unexpected response.";
+      if (!data.result) {
+        resultDiv.innerText = "Unexpected server response.";
+        return;
       }
+
+      resultDiv.innerText = `Result: ${data.result}`;
     } catch (error) {
-      console.error('Error:', error);
-      document.getElementById('result').innerText = "Error: Unable to scan.";
+      console.error("Scan error:", error);
+      resultDiv.innerText = "Error scanning URL.";
     }
-  }
+  });
 </script>
-
-
 
 </body>
 </html>

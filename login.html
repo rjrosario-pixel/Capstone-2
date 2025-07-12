@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login Page</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+  <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
   <div class="background">
@@ -12,20 +12,15 @@
       <h2>Login to Account</h2>
       <p>Please enter your email and password to continue</p>
 
-      <form>
+      <form id="login-form">
         <label class="text-label">Email address:</label>
-        <input type="email" placeholder="Enter E-mail" required />
+        <input type="email" id="email" placeholder="Enter E-mail" required />
 
         <div class="text-label">
           <label>Password</label>
-          <a href="#" class="forgot">Forget Password?</a>
+          <a href="#" class="forgot">Forgot Password?</a>
         </div>
-        <input type="password" placeholder="●●●●●●●" required />
-
-        <div class="remember">
-          <input type="checkbox" id="remember" />
-          <label for="remember">Remember Password</label>
-        </div>
+        <input type="password" id="password" placeholder="●●●●●●●" required />
 
         <button type="submit">Sign In</button>
       </form>
@@ -35,5 +30,37 @@
       </p>
     </div>
   </div>
+
+  <script>
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      try {
+        const res = await fetch("http://127.0.0.1:5000/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          credentials: "include",
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          alert("Login successful!");
+          window.location.href = "dash.html";  // Update if needed
+        } else {
+          alert(data.message || "Login failed.");
+        }
+      } catch (error) {
+        alert("Error occurred: " + error.message);
+        console.error(error);
+      }
+    });
+  </script>
 </body>
 </html>
