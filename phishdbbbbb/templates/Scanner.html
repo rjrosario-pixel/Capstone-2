@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phishing Scanner</title>
+  <link rel="stylesheet" href="/static/style.css"/>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <img src="images/logo (1).png" alt="logo" />
+  </div>
+  <nav>
+    <a href="Scanner.html" class="active">URL and Domain Scanner</a>
+    <a href="BlockPage.html">Blocking</a>
+    <a href="dash.html">Dashboard</a>
+  </nav>
+  <div class="profile">
+    <div class="notification">
+      <span class="bell" onclick="toggleNotifications()">🔔</span>
+      <span class="notification-badge" id="notifBadge" style="display: none;">1</span>
+
+      <div class="notification-box" id="notificationBox">
+        <!-- Dynamic notification items will be inserted here -->
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="main-container">
+  <div class="scanner-box">
+    <h2>Scan Here to Check If the Link Is a Phishing Threat!</h2>
+    <input type="text" id="urlInput" placeholder="Type any URL or Domain" />
+    <button onclick="scanURL()">Scan</button>
+    <div id="result" style="margin-top: 20px; font-weight: bold;"></div>
+  </div>
+</div>
+
+<script>
+function toggleNotifications() {
+  const box = document.getElementById("notificationBox");
+  box.classList.toggle("show");
+}
+
+function addNotificationToBox(html) {
+  const box = document.getElementById("notificationBox");
+  const newNotif = document.createElement("div");
+  newNotif.className = "notification-item";
+  newNotif.innerHTML = html;
+  box.prepend(newNotif);
+  document.getElementById("notifBadge").style.display = 'block';
+}
+
+async function scanURL() {
+  const url = document.getElementById('urlInput').value;
+  if (!url) {
+    document.getElementById('result').innerText = "Please enter a URL.";
+    return;
+  }
+
+  try {
+    const response = await fetch('http://127.0.0.1:5000/predict', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: url })
+    });
+
+    const data = await response.json();
+
+    if (data.result) {
+      const resultText = `Result: ${data.result}`;
+      document.getElementById('result').innerText = resultText;
+
+      const now = new Date().toLocaleTimeString();
+      const isPhish = data.result.toLowerCase() === 'phishing';
+
+      const html = `
+        <small>⚠️ ALERT</small> <span class="time">${now}</span>
+        <p><strong>${data.result}</strong><br>
+        ${isPhish
+          ? 'This site has been flagged as a phishing threat. <a href="#">Click here to block</a>'
+          : 'This site appears to be safe and no threats were detected.'}
+        </p>
+      `;
+
+      addNotificationToBox(html);
+
+      const popup = document.createElement('div');
+      popup.className = 'notification-popup';
+      popup.innerHTML = `
+        <div class="notification-item">
+          ${html}
+        </div>`;
+      document.body.appendChild(popup);
+      setTimeout(() => popup.remove(), 3000);
+    } else {
+      document.getElementById('result').innerText = "Error: Unexpected response.";
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    document.getElementById('result').innerText = "Error: Unable to scan.";
+  }
+}
+</script>
+
+</body>
+</html>
